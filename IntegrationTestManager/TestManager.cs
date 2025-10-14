@@ -42,6 +42,8 @@ public class TestManager
             return initializationResult;
         }
 
+        
+
         EndTimer();
 
         return Result.Success();

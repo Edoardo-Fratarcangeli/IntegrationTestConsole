@@ -10,7 +10,7 @@ public interface IContextService
     /// <summary/>
     public string CacheFolderPath { get; }
     /// <summary/>
-    public int DegreeOfParallelism { get; }
+    public int? DegreeOfParallelism { get; }
     /// <summary/>
     public bool EnableLogger { get; }
     /// <summary/>
