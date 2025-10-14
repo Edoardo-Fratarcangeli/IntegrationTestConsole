@@ -1,0 +1,50 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Default",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/IntegrationTestManager/bin/Debug/net9.0/IntegrationTestManager.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/IntegrationTestManager",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Run Verbose",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/IntegrationTestManager/bin/Debug/net9.0/IntegrationTestManager.dll",
+            "args": ["--verbose"],
+            "cwd": "${workspaceFolder}/IntegrationTestManager",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Run Logger",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/IntegrationTestManager/bin/Debug/net9.0/IntegrationTestManager.dll",
+            "args": ["--logger"],
+            "cwd": "${workspaceFolder}/IntegrationTestManager",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Run Verbose + Logger",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/IntegrationTestManager/bin/Debug/net9.0/IntegrationTestManager.dll",
+            "args": ["--verbose", "--logger"],
+            "cwd": "${workspaceFolder}/IntegrationTestManager",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        }
+
+    ]
+}

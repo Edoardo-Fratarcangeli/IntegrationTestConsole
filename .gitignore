@@ -1,0 +1,5 @@
+# GITIGNORE FILE
+IntegrationTestManager/bin
+IntegrationTestManager/obj
+
+#.vscode
