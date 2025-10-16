@@ -1,7 +1,7 @@
 using IntegrationTestManager.Utility;
 using System.Linq;
 
-namespace IntegrationTestManager.DataServices;
+namespace IntegrationTestManager.Configuration.DataServices;
 
 /// <summary>
 /// Context service to set app all the necessities of the application
@@ -31,6 +31,10 @@ public class ContextService : IContextService
     /// <inheritdoc/>
     /// </summary>
     public string ExePath { get; private set; }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public bool UseGPUComputation { get; private set; }
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -93,7 +97,14 @@ public class ContextService : IContextService
         ExePath = ResolveAnyAmbientVariable(value);
         return this;
     }
-
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IContextService SetUseGPUComputation(bool value)
+    {
+        UseGPUComputation = value;
+        return this;
+    }
     /// <summary>
     /// <inheritdoc/>
     /// </summary>

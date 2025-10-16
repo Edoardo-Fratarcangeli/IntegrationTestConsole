@@ -1,0 +1,55 @@
+{
+  "context": {
+    "useConfigJson": true,
+    "testConfigurationChosen": "Production"
+  },
+  "testConfigurations": [
+    {
+      "type": "ParallelCPU-Logger",
+      "variables": 
+      {
+        "CacheFolderPath": "C://home//mytestfolder",
+        "DegreeOfParallelism": "8" ,
+        "EnableLogger": true ,
+        "ExePath": "D://OverpowerfulTester.exe" ,
+        "UseGPUComputation": false ,
+        "TestMode": "1" 
+      }
+    },
+    {
+      "type": "ParallelGPU-Logger",
+      "variables": 
+      {
+        "CacheFolderPath": "C://home//mytestfolder",
+        "EnableLogger": true ,
+        "ExePath": "D://OverpowerfulTester.exe" ,
+        "UseGPUComputation": true ,
+        "TestMode": "parallel"
+      }
+    },
+    {
+      "type": "SequentialCPU-VerboseLogger",
+      "variables": 
+       {
+        "CacheFolderPath": "",
+        "DegreeOfParallelism": "" ,
+        "EnableLogger": "" ,
+        "EnableVerbose": "" ,
+        "ExePath": "" ,
+        "UseGPUComputation": "" ,
+        "TestMode": "" ,
+        "Tests": "" 
+      }
+    },
+    {
+      "type": "DoTwoTests",
+      "variables": 
+       {
+        "CacheFolderPath": "/home/myself/tests",
+        "ExePath": "/home/myself/OverpowerfulTester.py" ,
+        "TestMode": "seq" ,
+        "Tests": "test1 test992" 
+      }
+    }
+  ]
+}

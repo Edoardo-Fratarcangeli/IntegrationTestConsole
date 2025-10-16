@@ -1,4 +1,6 @@
-namespace IntegrationTestManager.DataServices;
+using IntegrationTestManager.Utility;
+
+namespace IntegrationTestManager.Configuration.DataServices;
 
 /// <summary>
 /// Context service interface 
@@ -17,6 +19,8 @@ public interface IContextService
     public bool EnableVerbose { get; }
     /// <summary/>
     public string ExePath { get; }
+    /// <summary/>
+    public bool UseGPUComputation { get; }
     /// <summary/>
     public TestMode TestMode { get; }
     /// <summary/>
@@ -38,6 +42,8 @@ public interface IContextService
     public IContextService SetEnableVerbose(bool value);
     /// <summary/>
     public IContextService SetExePath(string value);
+    /// <summary/>
+    public IContextService SetUseGPUComputation(bool value);
     /// <summary/>
     public IContextService SetTestMode(TestMode value);
     /// <summary/>

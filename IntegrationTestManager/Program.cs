@@ -1,5 +1,5 @@
 ﻿using IntegrationTestManager.CommandLine;
-using IntegrationTestManager.DataServices;
+using IntegrationTestManager.Configuration.DataServices;
 using IntegrationTestManager.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -119,6 +119,7 @@ internal class Program
 					   .SetEnableLogger(options.EnableLogger?? false)
 					   .SetEnableVerbose(options.EnableVerbose?? false)
 					   .SetExePath(options.ExePath)
+					   .SetUseGPUComputation(options.UseGPUComputation?? false)
 					   .SetTestMode(options.TestMode.ToTestMode())
 					   .SetTests(options.Tests);
 

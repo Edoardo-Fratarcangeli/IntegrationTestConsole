@@ -1,4 +1,4 @@
-namespace IntegrationTestManager;
+namespace IntegrationTestManager.Utility;
 
 /// <summary>
 /// Exception of a try/catch exception managed

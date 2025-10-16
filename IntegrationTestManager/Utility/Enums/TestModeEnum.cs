@@ -1,4 +1,4 @@
-﻿namespace IntegrationTestManager;
+﻿namespace IntegrationTestManager.Utility;
 
 /// <summary>
 /// Test modality enum
@@ -10,12 +10,12 @@ public enum TestMode
 	/// </summary>
 	None,
 	/// <summary>
-	/// Sequential tests
-	/// </summary>
-	Sequential,
-	/// <summary>
 	/// Parallel tests
 	/// </summary>
 	Parallel,
+	/// <summary>
+	/// Sequential tests
+	/// </summary>
+	Sequential,
 }
 

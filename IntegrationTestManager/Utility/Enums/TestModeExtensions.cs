@@ -1,4 +1,4 @@
-namespace IntegrationTestManager;
+namespace IntegrationTestManager.Utility;
 
 /// <summary>
 /// Class for extension methods of <see cref="TestMode"/>
@@ -10,8 +10,8 @@ public static class TestModeExtensions
     {
         return value switch
         {
-            1 => TestMode.Sequential,
-            2 => TestMode.Parallel,
+            1 => TestMode.Parallel,
+            2 => TestMode.Sequential,
             _ => TestMode.None
         };
     }

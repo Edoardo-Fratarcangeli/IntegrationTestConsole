@@ -21,7 +21,10 @@ public sealed class CommandLineOptions
 	[Option('x', "exepath", Required = false, HelpText = "Full path to actor of a test (usually .exe).")]
 	public string ExePath { get; set; } = null;
 
-	[Option('m', "mode", Required = false, HelpText = "Modality of execution: (1) sequential (2) parallel")]
+	[Option('g', "gpu", Required = false, HelpText = "Use GPU for computations")]
+	public bool? UseGPUComputation { get; set; } = null;
+
+	[Option('m', "mode", Required = false, HelpText = "Modality of execution: (1) parallel (2) sequential ")]
 	public ushort? TestMode { get; set; } = null;
 
 	[Option('t', "tests", Required = false, HelpText = "Specific test to execute")]
@@ -36,10 +39,10 @@ internal class CommandLineParser
 
 	public void Parse(string[] args)
 	{
-		Parser parser = new Parser(ConfigurationParser);
-		var p = parser.ParseArguments<CommandLineOptions>(args.ToArray())
-						.WithParsed(opts => ReadOptions(opts))
-						.WithNotParsed((errs) => HandleParseError(errs));
+		Parser parser = new (ConfigurationParser);
+		var p = parser.ParseArguments<CommandLineOptions>([.. args])
+						.WithParsed(ReadOptions)
+						.WithNotParsed(HandleParseError);
 	}
 
 	private void ConfigurationParser(ParserSettings settings)
@@ -52,6 +55,6 @@ internal class CommandLineParser
 
 	private static void HandleParseError(IEnumerable errs)
 	{
-		Console.WriteLine($"Parse Error: {errs.ToString()}");
+		Console.WriteLine($"Parse Error: {errs}");
 	}
 }

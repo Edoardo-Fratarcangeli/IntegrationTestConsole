@@ -1,0 +1,3 @@
+{
+  "commandLineArgument": " {{ testName }}/{{ testName }}.txt {{ firstTestArgument }} {{ secondTestArgument }}"
+}

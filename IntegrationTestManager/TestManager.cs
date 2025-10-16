@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using IntegrationTestManager.DataServices;
+using IntegrationTestManager.Configuration.DataServices;
 using IntegrationTestManager.Utility;
 using Microsoft.Extensions.Logging;
 
@@ -105,33 +105,6 @@ public class TestManager
 
 	#region ExecuteTest
 
-	private (Process process, string filePath, bool) ExecuteTest((string name, string commandArgument) test)
-	{
-        bool isExitedCorrectly = true;
-        Process process = new();
-
-        try
-        {
-            DecorateProcess(process, testExecutorPath: Context.ExePath,
-                                     commandArgument: test.commandArgument);
-            process.Start();
-            process.WaitForExit();
-        }
-        catch (Exception e)
-        {
-            AddError(e);
-            isExitedCorrectly = false;
-        }
-        finally
-        {
-            if (isExitedCorrectly == false)
-            {
-                process?.Kill();
-            }
-        }
-
-        return (process, Path.GetFileName($"{test.name}"), isExitedCorrectly);
-    }
 
     private IEnumerable<(Process process, string name, bool isExitedCorrectly)> ExecuteTests(IEnumerable<(string name, string commandArgument)> tests)
     {
@@ -222,26 +195,6 @@ public class TestManager
 
         Console.ResetColor();
 	}
-	#endregion
-
-	#region CreateShellProcess
-
-	private static Process DecorateProcess(Process process,
-                                         string testExecutorPath,
-                                         string commandArgument)
-    {
-        process ??= new();
-
-		process.StartInfo.FileName = testExecutorPath;
-		process.StartInfo.Arguments = commandArgument;
-		process.StartInfo.UseShellExecute = false;
-        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-        process.StartInfo.RedirectStandardError = true;
-        process.StartInfo.RedirectStandardOutput = true;
-
-		return process;
-	}
-
 	#endregion
 
     #region Utility
