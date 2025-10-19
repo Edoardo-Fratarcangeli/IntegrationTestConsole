@@ -44,4 +44,38 @@ public class Result
     }
     
     #endregion
+
+    #region Checking Methods
+
+    /// <summary>
+    /// Invokes <paramref name="method"/> and verifies if failed
+    /// </summary>
+    public static bool IsFailed(Func<Result> method)
+    {
+        if (method == null)
+        {
+            return true;
+        }
+
+        Result result = method.Invoke();
+
+        return result.IsFailed();
+    }
+    /// <summary>
+    /// Invokes <paramref name="method"/> and verifies if succeded
+    /// </summary>
+    public static bool IsSucceeded(Func<Result> method)
+    {
+        if (method == null)
+        {
+            return true;
+        }
+
+        Result result = method.Invoke();
+
+        return result.IsFailed() == false;
+    }
+
+    #endregion
+
 }

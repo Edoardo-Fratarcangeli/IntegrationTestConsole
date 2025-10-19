@@ -10,6 +10,8 @@ public interface IContextService
     #region Public Properties
 
     /// <summary/>
+    public string AppName { get; }
+    /// <summary/>
     public string CacheFolderPath { get; }
     /// <summary/>
     public int? DegreeOfParallelism { get; }
@@ -32,6 +34,8 @@ public interface IContextService
 
     #region Setters
 
+    /// <summary/>
+    public IContextService SetAppName(string value);
     /// <summary/>
     public IContextService SetCacheFolderPath(string value);
     /// <summary/>

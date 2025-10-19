@@ -34,6 +34,14 @@ public class Result<T> : Result
         return new Result<T>(value, succeeded: true, exceptions);
     }
 
+    public static new Result<T> Fail()
+    {
+        return new Result<T>(default, succeeded: false);
+    }
+    public static new Result<T> Fail(IEnumerable<Exception> exceptions)
+    {
+        return new Result<T>(default, succeeded: false, exceptions);
+    }    
     public static Result<T> Fail(T value)
     {
         return new Result<T>(value, succeeded: false);
@@ -43,5 +51,38 @@ public class Result<T> : Result
         return new Result<T>(value, succeeded: false, exceptions);
     }
     
+    #endregion
+
+    #region Checking Methods
+
+    /// <summary>
+    /// Invokes <paramref name="method"/> and verifies if failed
+    /// </summary>
+    public static bool IsFailed(Func<Result<T>> method)
+    {
+        if (method == null)
+        {
+            return true;
+        }
+
+        Result<T> result = method.Invoke();
+
+        return result.IsFailed();
+    }
+    /// <summary>
+    /// Invokes <paramref name="method"/> and verifies if succeded
+    /// </summary>
+    public static bool IsSucceeded(Func<Result<T>> method)
+    {
+        if (method == null)
+        {
+            return true;
+        }
+
+        Result<T> result = method.Invoke();
+
+        return result.IsFailed() == false;
+    }
+
     #endregion
 }

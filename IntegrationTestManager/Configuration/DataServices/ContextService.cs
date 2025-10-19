@@ -14,6 +14,10 @@ public class ContextService : IContextService
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    public string AppName { get; private set; }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public string CacheFolderPath { get; private set; }
     /// <summary>
     /// <inheritdoc/>
@@ -57,6 +61,14 @@ public class ContextService : IContextService
 
     #region Setters
     
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IContextService SetAppName(string value)
+    {
+        AppName = value;
+        return this;
+    }
     /// <summary>
     /// <inheritdoc/>
     /// </summary>

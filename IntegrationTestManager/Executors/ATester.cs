@@ -8,11 +8,9 @@ namespace IntegrationTestManager.Executors;
 /// <summary>
 /// Abstract class of a test executor
 /// </summary>
-public abstract class ATester
+public abstract class ATester : LogEntity<TestManager>
 {
     public IContextService Context { get; init; }
-    private readonly ILogger<TestManager> _logger;
-    CancellationTokenSource CancellationTokenSource { get; init; }
 
     #region Constructor
     /// <summary>
@@ -20,9 +18,9 @@ public abstract class ATester
     /// </summary>
     public ATester(IContextService context,
                     ILogger<TestManager> logger)
+            : base (logger, context.EnableLogger)
     {
         Context = context;
-        _logger = logger;
     }
     #endregion
 
@@ -36,47 +34,6 @@ public abstract class ATester
     #endregion
 
     #region Protected Methods
-
-    #region LogMessage
-
-    protected void AddError(Exception exception = null, string message = null, params object[] args)
-    {
-        string defaultMessage = "Error";
-        if(Context.EnableLogger)
-            _logger.LogError(message ?? defaultMessage,  args);
-#if DEBUG
-        if(exception != null)
-        {
-            throw new CatchedException(defaultMessage, exception);
-        }
-#endif
-    }
-    protected void AddWarning(Exception exception = null, string message = null, params object[] args)
-    {
-        string defaultMessage = "Warning";
-        if(Context.EnableLogger)
-            _logger.LogWarning(message ?? defaultMessage,  args);
-#if DEBUG
-        if(exception != null)
-        {
-            throw new CatchedException(defaultMessage, exception);
-        }
-#endif
-    }
-    protected void AddInfo(Exception exception = null, string message = null, params object[] args)
-    {
-        string defaultMessage = "Information";
-        if(Context.EnableLogger)
-            _logger.LogInformation(message ?? defaultMessage, args);
-#if DEBUG
-        if(exception != null)
-        {
-            throw new CatchedException(defaultMessage, exception);
-        }
-#endif
-    }
-
-    #endregion
 
     protected static Process DecorateProcess(Process process,
                                                 string testExecutorPath,

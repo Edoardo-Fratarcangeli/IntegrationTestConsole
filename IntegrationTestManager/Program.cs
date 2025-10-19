@@ -1,4 +1,5 @@
-﻿using IntegrationTestManager.CommandLine;
+﻿using System.Reflection;
+using IntegrationTestManager.CommandLine;
 using IntegrationTestManager.Configuration.DataServices;
 using IntegrationTestManager.Utility;
 using Microsoft.Extensions.DependencyInjection;
@@ -109,6 +110,8 @@ internal class Program
 	{
 		try
 		{
+			context.SetAppName(Assembly.GetEntryAssembly().GetName().Name);
+
 			CommandLineParser parser = new();
 			parser.Parse(args);
 

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using IntegrationTestManager.Configuration.DataServices;
+using IntegrationTestManager.Executors;
 using IntegrationTestManager.Utility;
 using Microsoft.Extensions.Logging;
 
@@ -8,24 +9,25 @@ namespace IntegrationTestManager;
 /// <summary>
 /// Tests executor
 /// </summary>
-public class TestManager
+public class TestManager : LogEntity<TestManager>
 {
-    IContextService Context { get; init; }
 
-    private readonly ILogger<TestManager> _logger;
+    private Stopwatch _stopWatch;
+    
     CancellationTokenSource CancellationTokenSource { get; init; }
-	private static int _incremental = 1;
-	private static Stopwatch _stopWatch;
+    IContextService Context { get; init; }
+    private ExecutorType ExecutorType { get; set; }   
+
 
     #region Constructor
     /// <summary/>
-    public TestManager(IContextService contextService,
+    public TestManager(IContextService context,
                         ILogger<TestManager> logger,
                         CancellationTokenSource cancellationTokenSource)
+            : base(logger, context.EnableLogger)
     {
-        Context = contextService;
-        _logger = logger;
         CancellationTokenSource = cancellationTokenSource;
+        Context = context;
     }
     #endregion
 
@@ -34,17 +36,27 @@ public class TestManager
     /// <summary/>
     public Result Execute()
     {
-
-		StartTimer();
-        if (Initialize() is Result initializationResult &&
-            initializationResult.Succeeded == false)
+        if (Result.IsFailed(Initialize))
         {
-            return initializationResult;
+            return Result.Fail();
         }
 
-        
+        if (ExecutorFactory.Create(ExecutorType) is Result<ATester> testerResult)
+        {
+            if (testerResult.Succeeded)
+            {
+                testerResult.Value.Execute();
+            }
+            else
+            {
+                AddError(exception: new AggregateException(testerResult.Exceptions));
+            }
+        }
 
-        EndTimer();
+        if (Result.IsFailed(Finalize))
+        {
+            return Result.Fail();
+        }
 
         return Result.Success();
     }
@@ -53,58 +65,23 @@ public class TestManager
 
     #region Private Methods
 
-    #region LogMessage
-
-    private void AddError(Exception exception = null, string message = null, params object[] args)
-    {
-        string defaultMessage = "Error";
-        if(Context.EnableLogger)
-            _logger.LogError(message ?? defaultMessage,  args);
-#if DEBUG
-        if(exception != null)
-        {
-            throw new CatchedException(defaultMessage, exception);
-        }
-#endif
-    }
-    private void AddWarning(Exception exception = null, string message = null, params object[] args)
-    {
-        string defaultMessage = "Warning";
-        if(Context.EnableLogger)
-            _logger.LogWarning(message ?? defaultMessage,  args);
-#if DEBUG
-        if(exception != null)
-        {
-            throw new CatchedException(defaultMessage, exception);
-        }
-#endif
-    }
-    private void AddInfo(Exception exception = null, string message = null, params object[] args)
-    {
-        string defaultMessage = "Information";
-        if(Context.EnableLogger)
-            _logger.LogInformation(message ?? defaultMessage, args);
-#if DEBUG
-        if(exception != null)
-        {
-            throw new CatchedException(defaultMessage, exception);
-        }
-#endif
-    }
-
-    #endregion
-
     #region Initialize
     private Result Initialize()
     {
-        _incremental = 0;
+        StartTimer();
+        return Result.Success();
+    }
+    #endregion
 
+    #region Finalize
+    private Result Finalize()
+    {
+        EndTimer();
         return Result.Success();
     }
     #endregion
 
 	#region ExecuteTest
-
 
     private IEnumerable<(Process process, string name, bool isExitedCorrectly)> ExecuteTests(IEnumerable<(string name, string commandArgument)> tests)
     {
@@ -142,71 +119,8 @@ public class TestManager
     }
 
 	#endregion
-    
-    #region PrintOutput
-
-    private static void PrintOutput((Process process, string name, bool isExitedCorrectly) processAndNameAndError,
-                                    int total)
-    {
-        var process = processAndNameAndError.process;
-        var name = processAndNameAndError.name;
-        var isExitedCorrectly = processAndNameAndError.isExitedCorrectly;
-
-        var stringResult = "";
-
-        Console.ForegroundColor = ConsoleColor.Blue;
-        stringResult = "- " + (int)GetPercentage(total) + "%";
-        Console.Write(stringResult);
-
-        if (isExitedCorrectly == false)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            stringResult = $"\tProcess Killed : ";
-            Console.Write(stringResult);
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            stringResult = $"\t({process.TotalProcessorTime.Seconds} s)";
-            Console.Write(stringResult);
-        }
-
-        Console.ResetColor();
-        stringResult = "\t " + name;
-
-        Console.WriteLine(stringResult);
-    }
-    
-	#endregion
-
-	#region Title/Ending
-	private static void PrintEnding()
-	{
-		Console.ForegroundColor = ConsoleColor.Green;
-		Console.WriteLine($"\n\nALL COMPLETED in ({_stopWatch.Elapsed}) ");
-		Console.ResetColor();
-	}
-
-	private static void PrintTitle()
-	{
-		Console.ForegroundColor = ConsoleColor.Green;
-
-		Console.WriteLine($"\n INTEGRATION TEST CONSOLE \n");
-
-        Console.ResetColor();
-	}
-	#endregion
 
     #region Utility
-
-    #region GetPercentage
-    private static double GetPercentage(double total)
-    {
-        var count = _incremental++;
-
-        return count / (double)total * 100;
-    }
-	#endregion
 
 	#region Timer
 	private static void StartTimer()

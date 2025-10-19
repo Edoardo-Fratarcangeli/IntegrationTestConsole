@@ -17,6 +17,7 @@ public static class ResultExtensions
 
         return result.Exceptions.Any();
     }
+
     /// <summary>
     /// Verifies if any exceptions
     /// </summary>
@@ -26,8 +27,21 @@ public static class ResultExtensions
         {
             return null;
         }
-        
+
         return result.Exceptions.Any();
+    }
+
+    /// <summary>
+    /// Verifies if failed
+    /// </summary>
+    public static bool IsFailed(this Result result)
+    {
+        if (result == null)
+        {
+            return true;
+        }
+
+        return result.Succeeded == false;
     }
     /// <summary>
     /// Verifies if failed and collects itself
@@ -36,9 +50,17 @@ public static class ResultExtensions
     {
         outResult = result;
 
+        return result.IsFailed();
+    }
+
+    /// <summary>
+    /// Verifies if failed
+    /// </summary>
+    public static bool IsFailed<T>(this Result<T> result)
+    {
         if (result == null)
         {
-            return false;
+            return true;
         }
 
         return result.Succeeded == false;
@@ -50,11 +72,6 @@ public static class ResultExtensions
     {
         outResult = result;
 
-        if (result == null)
-        {
-            return false;
-        }
-
-        return result.Succeeded == false;
+        return result.IsFailed<T>();
     }
 }
