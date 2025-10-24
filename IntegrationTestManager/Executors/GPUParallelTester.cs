@@ -1,13 +1,13 @@
-using IntegrationTestManager.Configuration.DataServices;
+using IntegrationTestManager.Configuration;
 using IntegrationTestManager.Utility;
 using Microsoft.Extensions.Logging;
 
 namespace IntegrationTestManager.Executors;
 
 /// <summary>
-/// 
+/// Parallel tester, executed on GPU
 /// </summary>
-public class GPUParallelTester : AParallelTester, IStrategy
+public class GPUParallelTester : AParallelTester, IStrategy, IExecutable
 {
 
     #region Constructor
@@ -20,7 +20,7 @@ public class GPUParallelTester : AParallelTester, IStrategy
 
     #region Public Methods
 
-    public override void Execute()
+    public Result Execute()
     {
         
     }

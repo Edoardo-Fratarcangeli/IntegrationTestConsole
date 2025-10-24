@@ -1,4 +1,4 @@
-using IntegrationTestManager.Configuration.DataServices;
+using IntegrationTestManager.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace IntegrationTestManager.Executors;

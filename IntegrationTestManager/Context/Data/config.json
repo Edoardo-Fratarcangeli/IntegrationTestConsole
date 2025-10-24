@@ -31,13 +31,13 @@
       "type": "SequentialCPU-VerboseLogger",
       "variables": 
        {
-        "CacheFolderPath": "",
+        "CacheFolderPath": "C://home//mytestfolder",
         "DegreeOfParallelism": "" ,
-        "EnableLogger": "" ,
-        "EnableVerbose": "" ,
-        "ExePath": "" ,
-        "UseGPUComputation": "" ,
-        "TestMode": "" ,
+        "EnableLogger": true ,
+        "EnableVerbose": true ,
+        "ExePath": "C://SimpleTester.exe" ,
+        "UseGPUComputation": false ,
+        "TestMode": "s" ,
         "Tests": "" 
       }
     },

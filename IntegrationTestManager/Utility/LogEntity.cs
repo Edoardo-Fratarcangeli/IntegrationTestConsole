@@ -8,7 +8,8 @@ using Microsoft.Extensions.Logging;
 /// </summary>
 public class LogEntity<T>
 {
-    private readonly ILogger<T> _logger;
+    public readonly ILogger<T> _logger;
+    
     private bool IsEnabled {get; set;}
 
     #region Constructor

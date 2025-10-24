@@ -1,27 +1,26 @@
 using System.Diagnostics;
-using IntegrationTestManager.Configuration.DataServices;
+using IntegrationTestManager.Configuration;
+using IntegrationTestManager.Executors;
 using Microsoft.Extensions.Logging;
 
 namespace IntegrationTestManager.Utility;
 
 /// <summary>
-/// Class that interact with console
+/// Class that prints on the console
 /// </summary>
-public class ConsoleService : LogEntity<TestManager>
+public class ConsolePrinter : LogEntity<TestManager>, IPrinter
 {
     public IContextService Context { get; init; }
 	private int _incremental;
-	private int _total;
+	private readonly int _total;
 
     #region Constructors
-    public ConsoleService(IContextService context,
-                          ILogger<TestManager> logger,
-                          int total)
+    public ConsolePrinter(IContextService context,
+                          ILogger<TestManager> logger)
             : base(logger, context.EnableLogger)
     {
         Context = context;
-        _total = total;
-
+        _total = context.Tests.Count();
         _incremental = 0;
     }
     #endregion
@@ -30,39 +29,45 @@ public class ConsoleService : LogEntity<TestManager>
 
     #region PrintOutput
 
-    private void PrintOutput((Process process, string name, bool isExitedCorrectly) processAndNameAndError)
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public void PrintOutput((Process process, string name, bool isExitedCorrectly) test)
     {
-        var process = processAndNameAndError.process;
-        var name = processAndNameAndError.name;
-        var isExitedCorrectly = processAndNameAndError.isExitedCorrectly;
-
         string stringResult;
 
         stringResult = "- " + GetPercentage() + "%";
         Write(stringResult, Blue);
 
-        if (isExitedCorrectly == false)
+        if (test.isExitedCorrectly == false)
         {
             stringResult = $"\tProcess Killed : ";
             Write(stringResult, Red);
         }
         else
         {
-            stringResult = $"\t({process.TotalProcessorTime.Seconds} s)";
+            stringResult = $"\t({test.process.TotalProcessorTime.Seconds} s)";
             Write(stringResult, Grey);
         }
 
-        WriteLine("\t " + name);
+        WriteLine("\t " + test.name);
 
-        PrintVerboseOutput(process, name, isExitedCorrectly);
+        PrintVerboseOutput(test);
     }
 
     #endregion
 
     #region PrintExtremes
 
-    private void PrintEnding(Stopwatch stopWatch) => WriteLine($"\n\nALL COMPLETED in ({stopWatch.Elapsed}) ", White);
-    private void PrintTitle() => WriteLine($"\n {Context.AppName} \n", Green);
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public void PrintEnding(Stopwatch stopWatch) => WriteLine($"\n\nALL COMPLETED in ({stopWatch.Elapsed}) ", White);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public void PrintTitle() => WriteLine($"\n {Context.AppName} \n", Green);
 
     #endregion
 
@@ -72,13 +77,13 @@ public class ConsoleService : LogEntity<TestManager>
 
     #region PrintVerboseOutput
 
-    private void PrintVerboseOutput(Process process, string name, bool isExitedCorrectly)
+    private void PrintVerboseOutput((Process process, string name, bool isExitedCorrectly) test)
     {
         if (Context.EnableVerbose)
         {
-            if (isExitedCorrectly)
+            if (test.isExitedCorrectly)
             {
-                if (process.StandardOutput.ToString() is string stdOutputResult &&
+                if (test.process.StandardOutput.ToString() is string stdOutputResult &&
                     stdOutputResult.IsNotNullOrEmpty())
                 {
                     stdOutputResult = $"\t{stdOutputResult.Replace("\n", "\n\t")}";
@@ -87,7 +92,7 @@ public class ConsoleService : LogEntity<TestManager>
             }
             else
             {
-                if (process.StandardError.ToString() is string stdOutputError &&
+                if (test.process.StandardError.ToString() is string stdOutputError &&
                     stdOutputError.IsNotNullOrEmpty())
                 {
                     stdOutputError = $"\t{stdOutputError.Replace("\n", "\n\t")}";
@@ -96,7 +101,7 @@ public class ConsoleService : LogEntity<TestManager>
             }
         }
 
-        AddInfo(message: $"Printed output of {name}, {(isExitedCorrectly ? "" : "NOT ")}exited correctly");
+        AddInfo(message: $"Printed output of {test.name}, {(test.isExitedCorrectly ? "" : "NOT ")}exited correctly");
     }
     
     #endregion 

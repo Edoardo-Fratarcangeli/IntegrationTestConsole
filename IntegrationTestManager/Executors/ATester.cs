@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using IntegrationTestManager.Configuration.DataServices;
+using IntegrationTestManager.Configuration;
 using IntegrationTestManager.Utility;
 using Microsoft.Extensions.Logging;
 
@@ -11,6 +11,7 @@ namespace IntegrationTestManager.Executors;
 public abstract class ATester : LogEntity<TestManager>
 {
     public IContextService Context { get; init; }
+    protected IPrinter Printer { get; init; }
 
     #region Constructor
     /// <summary>
@@ -21,19 +22,16 @@ public abstract class ATester : LogEntity<TestManager>
             : base (logger, context.EnableLogger)
     {
         Context = context;
+        Printer = new ConsolePrinter(context, logger);
     }
     #endregion
 
-    #region Abstract Methods
-
-    /// <summary>
-    /// Execute method
-    /// </summary>
-    public abstract void Execute();
-
-    #endregion
-
     #region Protected Methods
+
+    protected IEnumerable<(string name, string commandArgument)> BuildTestsList()
+    {
+        throw new NotImplementedException();
+    }
 
     protected static Process DecorateProcess(Process process,
                                                 string testExecutorPath,

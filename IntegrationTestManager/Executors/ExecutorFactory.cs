@@ -1,5 +1,5 @@
 using System.Reflection;
-using IntegrationTestManager.Configuration.DataServices;
+using IntegrationTestManager.Configuration;
 using IntegrationTestManager.Utility;
 using Microsoft.Extensions.Logging;
 
@@ -29,6 +29,7 @@ public class ExecutorFactory : LogEntity<TestManager>
                                 .Where(t => t.IsSubclassOf(typeof(ATester)))];
         Context = context;
         CancellationTokenSource = cancellationTokenSource;
+        IsInitialized = true;
     }
 
     #endregion
@@ -63,10 +64,9 @@ public class ExecutorFactory : LogEntity<TestManager>
                     }
                 }
             }
-
         }
 
-        return null;
+        return Result<ATester>.Fail();
     }
 
 

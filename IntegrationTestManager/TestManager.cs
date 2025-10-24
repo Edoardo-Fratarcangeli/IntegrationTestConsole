@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using IntegrationTestManager.Configuration.DataServices;
+using IntegrationTestManager.Configuration;
 using IntegrationTestManager.Executors;
 using IntegrationTestManager.Utility;
 using Microsoft.Extensions.Logging;
@@ -45,7 +45,10 @@ public class TestManager : LogEntity<TestManager>
         {
             if (testerResult.Succeeded)
             {
-                testerResult.Value.Execute();
+                if (testerResult.Value is IExecutable tester)
+                {
+                    tester.Execute();
+                }
             }
             else
             {
@@ -69,6 +72,9 @@ public class TestManager : LogEntity<TestManager>
     private Result Initialize()
     {
         StartTimer();
+        
+        ExecutorFactory.Initialize(Context, _logger, CancellationTokenSource);
+
         return Result.Success();
     }
     #endregion
@@ -77,59 +83,21 @@ public class TestManager : LogEntity<TestManager>
     private Result Finalize()
     {
         EndTimer();
+
         return Result.Success();
     }
     #endregion
 
-	#region ExecuteTest
-
-    private IEnumerable<(Process process, string name, bool isExitedCorrectly)> ExecuteTests(IEnumerable<(string name, string commandArgument)> tests)
-    {
-        IEnumerable<(Process, string, bool)> result = null;
-        try
-        {
-            object lockObj = new();
-            int total = tests.Count();
-
-            if(Context.TestMode.AsParallel())
-            result = tests.AsParallel()
-                            .WithDegreeOfParallelism(Context.DegreeOfParallelism?? Environment.ProcessorCount)
-                            .WithCancellation(CancellationTokenSource.Token)
-                            .Select(ExecuteTest)
-                            .Select(process =>
-                            {
-                                lock (lockObj)
-                                {
-                                    PrintOutput(process, total);
-                                }
-                                return process;
-                            })
-                            .ToList();
-        }
-        catch (Exception ex)
-        {
-            AddError(ex);
-        }
-        finally
-        {
-            CancellationTokenSource.Cancel();
-        }
-
-        return result;
-    }
-
-	#endregion
-
     #region Utility
 
 	#region Timer
-	private static void StartTimer()
+	private void StartTimer()
 	{
 		_stopWatch = new Stopwatch();
 		_stopWatch.Start();
 	}
 
-    private static void EndTimer()
+    private void EndTimer()
     {
         _stopWatch.Stop();
     }

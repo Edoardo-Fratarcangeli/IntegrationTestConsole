@@ -1,13 +1,13 @@
-using IntegrationTestManager.Configuration.DataServices;
+using IntegrationTestManager.Configuration;
 using IntegrationTestManager.Utility;
 using Microsoft.Extensions.Logging;
 
 namespace IntegrationTestManager.Executors;
 
 /// <summary>
-/// 
+/// Sequential tester, executed on GPU
 /// </summary>
-public class GPUSequentialTester : ATester, IStrategy
+public class GPUSequentialTester : ATester, IStrategy, IExecutable
 {
 
     #region Constructor
@@ -19,7 +19,7 @@ public class GPUSequentialTester : ATester, IStrategy
 
     #region Public Methods
 
-    public override void Execute()
+    public Result Execute()
     {
         
     }

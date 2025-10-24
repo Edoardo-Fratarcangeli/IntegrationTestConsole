@@ -1,0 +1,6 @@
+{
+  "firstArgument": "-hopeitpasses",
+  "secondArgument": "--ifnotImSad o_o",
+  "extension": "txt",
+  "commandLineArgument": " {{ testName }}/{{ testName }}.{{ extension }} {{ firstTestArgument }} {{ secondTestArgument }}"
+}

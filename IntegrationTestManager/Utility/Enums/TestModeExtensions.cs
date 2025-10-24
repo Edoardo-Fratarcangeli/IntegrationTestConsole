@@ -16,10 +16,5 @@ public static class TestModeExtensions
         };
     }
 
-    /// <summary/>
-    public static bool AsParallel(this TestMode mode)
-    {
-        return mode == TestMode.Parallel;
-    }
 }
 

@@ -1,6 +1,6 @@
 using IntegrationTestManager.Utility;
 
-namespace IntegrationTestManager.Configuration.DataServices;
+namespace IntegrationTestManager.Configuration;
 
 /// <summary>
 /// Context service interface 
@@ -22,6 +22,8 @@ public interface IContextService
     /// <summary/>
     public string ExePath { get; }
     /// <summary/>
+    public bool IsValid { get; }
+    /// <summary/>
     public bool UseGPUComputation { get; }
     /// <summary/>
     public TestMode TestMode { get; }
@@ -36,6 +38,8 @@ public interface IContextService
 
     /// <summary/>
     public IContextService SetAppName(string value);
+    /// <summary/>
+    public IContextService SetArgs(string[] value);
     /// <summary/>
     public IContextService SetCacheFolderPath(string value);
     /// <summary/>
@@ -60,6 +64,12 @@ public interface IContextService
     /// </summary>
     /// <returns></returns>
     IEnumerable<string> GetTestPaths();
+
+    /// <summary>
+    /// Set inner properties from Main args or Json
+    /// </summary>
+    /// <returns></returns>
+    Result SetProperties();
 
     #endregion
 }

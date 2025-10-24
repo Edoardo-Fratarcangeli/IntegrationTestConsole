@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using IntegrationTestManager.CommandLine;
-using IntegrationTestManager.Configuration.DataServices;
+﻿using IntegrationTestManager.Configuration;
 using IntegrationTestManager.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -17,9 +15,9 @@ internal class Program
 	{
 		CancellationTokenSource cancellationTokenSource = null;
 
-		if (Initialization().Succeeded == false)
+		if (Result.IsFailed(Initialization))
 		{
-			SafeFailedExit(cancellationTokenSource);
+			SafeFailedExit(nameof(Initialization));
 		}
 
 		ServiceProvider serviceProvider = null;
@@ -27,6 +25,7 @@ internal class Program
 		{
 			ILogger<TestManager> logger = null;
 
+			// --- inject services ---
 			var services = new ServiceCollection()
 									.AddLogging(builder =>
 									{
@@ -35,32 +34,30 @@ internal class Program
 									})
 									.AddSingleton<ShutdownManager>()
 									.AddTransient<IContextService, ContextService>();
-
 			serviceProvider = services.BuildServiceProvider();
 			
 			ShutdownManager shutdownManager = serviceProvider.GetRequiredService<ShutdownManager>();
 
-			IContextService contextService = serviceProvider.GetRequiredService<IContextService>();
-
-			if (SetUpContext(contextService, args).Succeeded == false)
+			// --- build context ---
+			IContextService contextService = serviceProvider.GetRequiredService<IContextService>()
+															.SetArgs(args);
+			if (Result.IsFailed(contextService.SetProperties))
 			{
-				SafeFailedExit(cancellationTokenSource);
+				SafeFailedExit(nameof(IContextService.SetProperties));
 			}
 
 			logger = serviceProvider.GetRequiredService<ILogger<TestManager>>();
-			
 			services.AddSingleton(provider =>
 			{
 				return new TestManager(contextService, logger, cancellationTokenSource);
 			});
-
 			serviceProvider = services.BuildServiceProvider();
 
+			// --- test execution ---
 			TestManager testManager = serviceProvider.GetRequiredService<TestManager>();
-
-			if (testManager.Execute().Succeeded == false)
+			if (Result.IsFailed(testManager.Execute))
 			{
-				SafeFailedExit(cancellationTokenSource);
+				SafeFailedExit(cancellationTokenSource, nameof(TestManager.Execute));
 			}
 			
 			shutdownManager.WaitForShutdown();
@@ -68,9 +65,9 @@ internal class Program
 		catch (Exception e)
 		{
 #if DEBUG
-            throw new CatchedException(e);
+        	throw new CatchedException(message: $"Collected in {nameof(Main)}", innerException: e);
 #else
-			Log?.LogError(e);
+			Console.WriteLine($"{nameof(CatchedException)} [{nameof(Main)}] : {e}");
 #endif
 		}
         finally
@@ -98,58 +95,27 @@ internal class Program
 		catch (Exception e)
 		{
 #if DEBUG
-            throw new CatchedException(e);
+        	throw new CatchedException(message: $"Collected in {nameof(Initialization)}", innerException: e);
 #else
-			Log?.LogError(e);
+			Console.WriteLine($"{nameof(CatchedException)} [{nameof(Initialization)}] : {e}");
             return Result.Fail();
 #endif
         }
 	}
 	
-    private static Result SetUpContext(IContextService context, string[] args)
+	private static void SafeFailedExit(string nameOfMethod)
 	{
-		try
-		{
-			context.SetAppName(Assembly.GetEntryAssembly().GetName().Name);
-
-			CommandLineParser parser = new();
-			parser.Parse(args);
-
-			if (parser.Options is CommandLineOptions options)
-			{
-				context.SetCacheFolderPath(options.CacheFolderPath)
-					   .SetDegreeOfParallelism(options.DegreeOfParallelism)
-					   .SetEnableLogger(options.EnableLogger?? false)
-					   .SetEnableVerbose(options.EnableVerbose?? false)
-					   .SetExePath(options.ExePath)
-					   .SetUseGPUComputation(options.UseGPUComputation?? false)
-					   .SetTestMode(options.TestMode.ToTestMode())
-					   .SetTests(options.Tests);
-
-				return Result.Success();
-			}
-		}
-		catch (Exception e)
-		{
 #if DEBUG
-            throw new CatchedException(e);
+		throw new ResultFailException(message: $"Collected in {nameOfMethod}");
 #else
-			Log?.LogError(e);
-            return Result.Fail();
+		Console.WriteLine($"{nameof(ResultFailException)}: {nameOfMethod}");
 #endif
-        }
-		
-		return Result.Fail();
-    }
-
-    private static void SafeFailedExit(CancellationTokenSource cancellationTokenSource)
-    {
-#if DEBUG
-        throw new ResultFailException();
-#else
-		Log?.LogError($"{nameof(ResultFailException)}: {nameof(GetType())}");
+	}
+	
+    private static void SafeFailedExit(CancellationTokenSource cancellationTokenSource, string nameOfMethod)
+	{
+		SafeFailedExit(nameOfMethod);
 		SafeExit(cancellationTokenSource);
-#endif
 	}
 
 	private static void SafeExit(CancellationTokenSource cancellationTokenSource)

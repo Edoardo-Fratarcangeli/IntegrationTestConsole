@@ -68,14 +68,14 @@ public class Result
     {
         if (method == null)
         {
-            return true;
+            return false;
         }
 
         Result result = method.Invoke();
 
         return result.IsFailed() == false;
     }
-
+    
     #endregion
 
 }
