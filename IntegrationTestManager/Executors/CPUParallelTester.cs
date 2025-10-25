@@ -44,7 +44,7 @@ public class CPUParallelTester : AParallelTester, IStrategy, IExecutable
                 {
                     try
                     {
-                        var executedTest = ExecuteTest(test);
+                        var executedTest = await ExecuteTestAsync(test);
                         Printer.PrintOutput(executedTest);
                         results.Add(executedTest);
                     }

@@ -50,7 +50,7 @@ public abstract class ATester : LogEntity<TestManager>
         if (jsonLoader.Load(fullPath) is JsonTemplateData jsonTemplate)
         {
             jsonTemplate.CacheFolderPath = Context.CacheFolderPath;
-            
+
             foreach (var test in Context.Tests)
             {
                 if (jsonTemplate.GetPersonalizedArgument(test) is string argument)
@@ -78,9 +78,9 @@ public abstract class ATester : LogEntity<TestManager>
 
         return process;
     }
-    
-	protected (Process process, string filePath, bool) ExecuteTest((string name, string commandArgument) test)
-	{
+
+    protected (Process process, string filePath, bool) ExecuteTest((string name, string commandArgument) test)
+    {
         bool isExitedCorrectly = true;
         Process process = new();
 
@@ -106,5 +106,46 @@ public abstract class ATester : LogEntity<TestManager>
 
         return (process, Path.GetFileName($"{test.name}"), isExitedCorrectly);
     }
+
+    protected async Task<(Process process, string filePath, bool isExitedCorrectly)> ExecuteTestAsync(
+        (string name, string commandArgument) test)
+    {
+        bool isExitedCorrectly = true;
+        var process = new Process();
+
+        try
+        {
+            DecorateProcess(process, testExecutorPath: Context.ExePath,
+                                     commandArgument: test.commandArgument);
+
+            process.Start();
+            await process.WaitForExitAsync();
+        }
+        catch (Exception e)
+        {
+            AddError(e);
+            isExitedCorrectly = false;
+        }
+        finally
+        {
+            if (!isExitedCorrectly)
+            {
+                try
+                {
+                    process?.Kill(true);
+                }
+                catch(Exception e)
+                {
+                    AddError(e);
+                    isExitedCorrectly = false;
+                }
+            }
+        }
+
+        return (process, Path.GetFileName($"{test.name}"), isExitedCorrectly);
+    }
+
+
+    
     #endregion
 }
