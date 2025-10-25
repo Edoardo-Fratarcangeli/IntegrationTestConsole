@@ -47,10 +47,6 @@ public class ContextService : IContextService
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public bool UseGPUComputation { get; private set; }
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
     public TestMode TestMode { get; private set; }
     /// <summary>
     /// <inheritdoc/>
@@ -122,15 +118,7 @@ public class ContextService : IContextService
     /// </summary>
     public IContextService SetExePath(string value)
     {
-        ExePath = ResolveAnyAmbientVariable(value);
-        return this;
-    }
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public IContextService SetUseGPUComputation(bool value)
-    {
-        UseGPUComputation = value;
+        ExePath = value;
         return this;
     }
     /// <summary>
@@ -149,19 +137,8 @@ public class ContextService : IContextService
         Tests = value;
         return this;
     }
-    
-    #endregion
 
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public IEnumerable<string> GetTestPaths()
-    {
-        if (Tests.IsNotNullOrEmpty())
-            return Tests;
-        else
-            return CollectTests() ?? [];
-    }
+    #endregion
 
     /// <summary>
     /// <inheritdoc/>
@@ -213,6 +190,7 @@ public class ContextService : IContextService
         IsValid = true;
         return Result.Success();
     }
+    
     #endregion
 
     #region Private Methods
@@ -232,7 +210,6 @@ public class ContextService : IContextService
                     .SetEnableLogger(variables.EnableLogger ?? false)
                     .SetEnableVerbose(variables.EnableVerbose ?? false)
                     .SetExePath(variables.ExePath)
-                    .SetUseGPUComputation(variables.UseGPUComputation ?? false)
                     .SetTestMode(variables.TestMode.ToTestMode())
                     .SetTests(variables.Tests);
 
@@ -255,7 +232,6 @@ public class ContextService : IContextService
                 .SetEnableLogger(options.EnableLogger ?? false)
                 .SetEnableVerbose(options.EnableVerbose ?? false)
                 .SetExePath(options.ExePath)
-                .SetUseGPUComputation(options.UseGPUComputation ?? false)
                 .SetTestMode(options.TestMode.ToTestMode())
                 .SetTests(options.Tests);
 
@@ -265,29 +241,5 @@ public class ContextService : IContextService
         return Result.Fail();
     }
 
-    private List<string> CollectTests()
-    {
-        List<string> fullPathTests = [];
-
-        if (Tests.IsNotNullOrEmpty())
-        {
-            foreach (var test in Tests)
-            {
-                fullPathTests.Add(Path.Combine(CacheFolderPath));
-            }
-        }
-        else
-        {
-            
-
-        }
-
-        return fullPathTests;
-    }
-
-    private string ResolveAnyAmbientVariable(string value)
-    {
-        throw new NotImplementedException();
-    }
     #endregion
 }

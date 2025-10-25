@@ -30,7 +30,37 @@ public abstract class ATester : LogEntity<TestManager>
 
     protected IEnumerable<(string name, string commandArgument)> BuildTestsList()
     {
-        throw new NotImplementedException();
+        IEnumerable<(string name, string commandArgument)> testList = [];
+        
+        string basePath = AppContext.BaseDirectory;
+        string fullPath = Path.GetFullPath(Path.Combine(basePath, "..", "Context", "Data", "template.json"));
+
+        if (File.Exists(fullPath) == false)
+        {
+            AddError(new FileNotFoundException(fullPath));
+            return testList;
+        }        
+        if(Directory.Exists(Context.CacheFolderPath) == false)
+        {
+            AddError(new DirectoryNotFoundException(Context.CacheFolderPath));
+            return testList;
+        }
+
+        TemplateLoader jsonLoader = new();
+        if (jsonLoader.Load(fullPath) is JsonTemplateData jsonTemplate)
+        {
+            jsonTemplate.CacheFolderPath = Context.CacheFolderPath;
+            
+            foreach (var test in Context.Tests)
+            {
+                if (jsonTemplate.GetPersonalizedArgument(test) is string argument)
+                {
+                    testList = testList.Append((test, argument));
+                }
+            }
+        }
+        
+        return testList;
     }
 
     protected static Process DecorateProcess(Process process,

@@ -16,14 +16,6 @@ public enum ExecutorType
 	/// <summary>
 	/// Sequential tests
 	/// </summary>
-	Sequential,
-	/// <summary>
-	/// Parallel tests on GPU
-	/// </summary>
-	GPUParallel,
-	/// <summary>
-	/// Sequential tests on GPU
-	/// </summary>
-	GPUSequential
+	Sequential
 }
 

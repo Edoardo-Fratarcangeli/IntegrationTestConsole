@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using IntegrationTestManager.Configuration;
 using IntegrationTestManager.Utility;
@@ -23,27 +24,35 @@ public class CPUParallelTester : AParallelTester, IStrategy, IExecutable
 
     public Result Execute()
     {
-        IEnumerable<(string name, string commandArgument)> tests = BuildTestsList();
+        return ExecuteAdaptiveAsync().GetAwaiter().GetResult();
+    }
 
-        IEnumerable<(Process, string, bool)> result = null;
+    public async Task<Result> ExecuteAdaptiveAsync()
+    {
+        var tests = BuildTestsList().ToList();
+        var results = new ConcurrentBag<(Process process, string name, bool isExitedCorrectly)>();
         try
         {
-            object lockObj = new();
-            int total = tests.Count();
-
-            result = tests.AsParallel()
-                            .WithDegreeOfParallelism(Context.DegreeOfParallelism?? Environment.ProcessorCount)
-                            .WithCancellation(CancellationTokenSource.Token)
-                            .Select(ExecuteTest)
-                            .Select(executedTest =>
-                            {
-                                lock (lockObj)
-                                {
-                                    Printer.PrintOutput(executedTest);
-                                }
-                                return executedTest;
-                            })
-                            .ToList();
+            await Parallel.ForEachAsync(
+                tests,
+                new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = Context.DegreeOfParallelism?? Environment.ProcessorCount,
+                    CancellationToken = CancellationTokenSource.Token
+                },
+                async (test, tkn) =>
+                {
+                    try
+                    {
+                        var executedTest = ExecuteTest(test);
+                        Printer.PrintOutput(executedTest);
+                        results.Add(executedTest);
+                    }
+                    catch (Exception ex)
+                    {
+                        AddError(ex);
+                    }
+                });
         }
         catch (Exception ex)
         {
@@ -54,7 +63,7 @@ public class CPUParallelTester : AParallelTester, IStrategy, IExecutable
             CancellationTokenSource.Cancel();
         }
 
-        return Result<IEnumerable<(Process process, string name, bool isExitedCorrectly)>>.Success(result);
+        return Result<IEnumerable<(Process process, string name, bool isExitedCorrectly)>>.Success(results);
     }
 
     public bool Match(ExecutorType executorType)

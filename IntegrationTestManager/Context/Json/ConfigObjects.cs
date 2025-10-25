@@ -1,6 +1,33 @@
 using System.Text.Json.Serialization;
+using IntegrationTestManager.Utility;
 
 namespace IntegrationTestManager.Configuration;
+
+/// <summary>
+/// Template block
+/// </summary>
+public record class JsonTemplateData
+{
+    public string Argument { get; init; } = string.Empty;
+    public string CacheFolderPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Get the personalized command line argument
+    /// </summary>
+    /// <returns></returns>
+    public string GetPersonalizedArgument(string testName)
+    {
+        if (Argument.IsNotNullOrEmpty() && CacheFolderPath.IsNotNullOrEmpty())
+        {
+            if(testName.IsNotNullOrEmpty())
+            {
+                return CacheFolderPath + Argument.Replace("{{testName}}", $"{testName}");
+            }
+        }
+
+        return null;
+    }
+}
 
 /// <summary>
 /// Configuration root block
@@ -68,7 +95,4 @@ public record class Variables
 
     [JsonPropertyName("Tests")]
     public IEnumerable<string> Tests { get; init; } = [];
-
-    [JsonPropertyName("UseGPUComputation")]
-    public bool? UseGPUComputation { get; init; }
 }

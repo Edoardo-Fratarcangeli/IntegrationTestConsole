@@ -20,9 +20,6 @@ public sealed class CommandLineOptions
 	[Option('x', "exepath", Required = false, HelpText = "Full path to actor of a test (usually .exe).")]
 	public string ExePath { get; set; } = null;
 
-	[Option('g', "gpu", Required = false, HelpText = "Use GPU for computations")]
-	public bool? UseGPUComputation { get; set; } = null;
-
 	[Option('m', "mode", Required = false, HelpText = "Modality of execution: (1) parallel (2) sequential ")]
 	public ushort? TestMode { get; set; } = null;
 

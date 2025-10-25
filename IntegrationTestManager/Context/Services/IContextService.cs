@@ -24,8 +24,6 @@ public interface IContextService
     /// <summary/>
     public bool IsValid { get; }
     /// <summary/>
-    public bool UseGPUComputation { get; }
-    /// <summary/>
     public TestMode TestMode { get; }
     /// <summary/>
     public IEnumerable<string> Tests { get; }
@@ -51,19 +49,11 @@ public interface IContextService
     /// <summary/>
     public IContextService SetExePath(string value);
     /// <summary/>
-    public IContextService SetUseGPUComputation(bool value);
-    /// <summary/>
     public IContextService SetTestMode(TestMode value);
     /// <summary/>
     public IContextService SetTests(IEnumerable<string> value);
-    
-    #endregion
 
-    /// <summary>
-    /// Collector method
-    /// </summary>
-    /// <returns></returns>
-    IEnumerable<string> GetTestPaths();
+    #endregion
 
     /// <summary>
     /// Set inner properties from Main args or Json

@@ -5,38 +5,35 @@
   },
   "testConfigurations": [
     {
-      "type": "ParallelCPU-Logger",
+      "type": "Parallel-Logger",
       "variables": 
       {
         "CacheFolderPath": "C://home//mytestfolder",
         "DegreeOfParallelism": "8" ,
         "EnableLogger": true ,
         "ExePath": "D://OverpowerfulTester.exe" ,
-        "UseGPUComputation": false ,
         "TestMode": "1" 
       }
     },
     {
-      "type": "ParallelGPU-Logger",
+      "type": "Parallel-Logger",
       "variables": 
       {
         "CacheFolderPath": "C://home//mytestfolder",
         "EnableLogger": true ,
         "ExePath": "D://OverpowerfulTester.exe" ,
-        "UseGPUComputation": true ,
         "TestMode": "parallel"
       }
     },
     {
-      "type": "SequentialCPU-VerboseLogger",
+      "type": "Sequential-VerboseLogger",
       "variables": 
        {
-        "CacheFolderPath": "C://home//mytestfolder",
+        "CacheFolderPath": "%AMBVARFOLDPATH%",
         "DegreeOfParallelism": "" ,
         "EnableLogger": true ,
         "EnableVerbose": true ,
         "ExePath": "C://SimpleTester.exe" ,
-        "UseGPUComputation": false ,
         "TestMode": "s" ,
         "Tests": "" 
       }

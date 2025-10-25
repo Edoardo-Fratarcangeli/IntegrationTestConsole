@@ -6,7 +6,7 @@ namespace IntegrationTestManager.Configuration;
 /// <summary>
 /// Json loader for template data
 /// </summary>
-public class TemplateLoader : ALoader, ILoader<string>
+public class TemplateLoader : ALoader, ILoader<JsonTemplateData>
 {
     #region Constructor
 
@@ -18,7 +18,7 @@ public class TemplateLoader : ALoader, ILoader<string>
 
     #region Public Methods
 
-    public string Load(string path)
+    public JsonTemplateData Load(string path)
     {
         if (!File.Exists(path))
         {
@@ -48,10 +48,14 @@ public class TemplateLoader : ALoader, ILoader<string>
                                       match =>
                                         {
                                             string key = match.Groups[1].Value;
-                                            return data.TryGetValue(key, out string value) ? value : match.Value;
+
+                                            if (data.TryGetValue(key, out string value))
+                                                return value;
+
+                                            return match.Value;
                                         });
 
-        return result;
+        return new JsonTemplateData { Argument = result };
     }
 
     #endregion
