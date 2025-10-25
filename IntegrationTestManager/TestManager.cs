@@ -16,7 +16,7 @@ public class TestManager : LogEntity<TestManager>
     
     CancellationTokenSource CancellationTokenSource { get; init; }
     IContextService Context { get; init; }
-    private ExecutorType ExecutorType { get; set; }   
+    private ExecutorType ExecutorType => Context.GetExecutorType();
 
 
     #region Constructor

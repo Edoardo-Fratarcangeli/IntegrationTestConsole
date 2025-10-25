@@ -52,16 +52,26 @@ public class ExecutorFactory : LogEntity<TestManager>
             foreach (var type in Istance.GetRegistry())
             {
                 (object[] parameters, Type[] parametersTypes) = ExtractParams(type);
-
-                if (type.GetConstructor(parametersTypes) is ConstructorInfo constructorInfo)
+                try
                 {
-                    if (constructorInfo.Invoke(parameters) is IStrategy strategy)
+                    if (type.GetConstructor(parametersTypes) is ConstructorInfo constructorInfo)
                     {
-                        if (strategy.Match(executorType))
+                        if (constructorInfo.Invoke(parameters) is IStrategy strategy)
                         {
-                            return Result<ATester>.Success((ATester)strategy);
+                            if (strategy.Match(executorType))
+                            {
+                                return Result<ATester>.Success((ATester)strategy);
+                            }
                         }
                     }
+                }
+                catch (Exception e)
+                {
+#if DEBUG
+        	        throw new CatchedException(message: $"Collected in {nameof(Create)}", innerException: e);
+#else
+			        Console.WriteLine($"{nameof(CatchedException)} [{nameof(Create)}] : {e}");
+#endif
                 }
             }
         }

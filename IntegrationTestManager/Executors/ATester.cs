@@ -33,7 +33,7 @@ public abstract class ATester : LogEntity<TestManager>
         IEnumerable<(string name, string commandArgument)> testList = [];
         
         string basePath = AppContext.BaseDirectory;
-        string fullPath = Path.GetFullPath(Path.Combine(basePath, "..", "Context", "Data", "template.json"));
+        string fullPath = Path.GetFullPath(Path.Combine(basePath, "Context", "Data", "template.json"));
 
         if (File.Exists(fullPath) == false)
         {

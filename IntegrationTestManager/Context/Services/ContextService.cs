@@ -190,6 +190,20 @@ public class ContextService : IContextService
         IsValid = true;
         return Result.Success();
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public ExecutorType GetExecutorType()
+    {
+        return TestMode switch
+        {
+            TestMode.Parallel => ExecutorType.Parallel,
+            TestMode.Sequential => ExecutorType.Sequential,
+            _ => ExecutorType.None
+        };
+    }
     
     #endregion
 
@@ -198,7 +212,7 @@ public class ContextService : IContextService
 	private Result CollectFromJason()
     {
         string basePath = AppContext.BaseDirectory;
-        string fullPath = Path.GetFullPath(Path.Combine(basePath, "..", "Data", "config.json"));
+        string fullPath = Path.GetFullPath(Path.Combine(basePath, "Context", "Data", "config.json"));
 
         if (File.Exists(fullPath) == false)
         {
@@ -213,32 +227,39 @@ public class ContextService : IContextService
         ConfigLoader jsonLoader = new();
         if(jsonLoader.Load(fullPath) is JsonConfigData jsonConfig)
         {
-            if(jsonConfig.GetCurrentVariables() is Variables variables)
+            if (jsonConfig.GetCurrentVariables() is Variables variables)
             {
                 this.SetCacheFolderPath(variables.CacheFolderPath)
-                    .SetDegreeOfParallelism(variables.DegreeOfParallelism?? Environment.ProcessorCount)
+                    .SetDegreeOfParallelism(GetDegreeOfParallelism(variables.DegreeOfParallelism))
                     .SetEnableLogger(variables.EnableLogger ?? false)
                     .SetEnableVerbose(variables.EnableVerbose ?? false)
                     .SetExePath(variables.ExePath)
                     .SetTestMode(variables.TestMode.ToTestMode())
-                    .SetTests(variables.Tests);
+                    .SetTests(variables.Tests.Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
                 return Result.Success();
             }
+            
+#if DEBUG
+            throw new JsonConfigDataNotFoundException(jsonConfig.Context.TestConfigurationChosen);
+#else
+			Console.WriteLine($"{nameof(JsonConfigDataNotFoundException)} [{nameof(CollectFromJason)}] : {jsonConfig.Context.TestConfigurationChosen} configutation not found");
+            return Result.Fail();
+#endif
         }
 
         return Result.Fail();
 	}
-	
+
     private Result CollectFromCommandLine()
     {
-		CommandLineParser parser = new();
-		parser.Parse(Args);
+        CommandLineParser parser = new();
+        parser.Parse(Args);
 
         if (parser.Options is CommandLineOptions options)
         {
             this.SetCacheFolderPath(options.CacheFolderPath)
-                .SetDegreeOfParallelism(options.DegreeOfParallelism?? Environment.ProcessorCount)
+                .SetDegreeOfParallelism(GetDegreeOfParallelism(options.DegreeOfParallelism))
                 .SetEnableLogger(options.EnableLogger ?? false)
                 .SetEnableVerbose(options.EnableVerbose ?? false)
                 .SetExePath(options.ExePath)
@@ -249,6 +270,12 @@ public class ContextService : IContextService
         }
 
         return Result.Fail();
+    }
+    
+    private static int GetDegreeOfParallelism(int? degreeOfParallelism)
+    {
+        int degree = degreeOfParallelism ?? Environment.ProcessorCount;
+        return Math.Max(degree, Environment.ProcessorCount);
     }
 
     #endregion

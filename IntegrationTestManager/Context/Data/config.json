@@ -8,15 +8,31 @@
       "type": "Parallel-Logger",
       "variables": 
       {
+        "CacheFolderPath": "this will be overritten"
+      }
+    },
+    {
+      "type": "Production",
+      "variables": 
+      {
         "CacheFolderPath": "C://home//mytestfolder",
-        "DegreeOfParallelism": "8" ,
-        "EnableLogger": true ,
         "ExePath": "D://OverpowerfulTester.exe" ,
         "TestMode": "1" 
       }
     },
     {
       "type": "Parallel-Logger",
+      "variables": 
+      {
+        "CacheFolderPath": "C://home//mytestfolder",
+        "DegreeOfParallelism": 8 ,
+        "EnableLogger": true ,
+        "ExePath": "D://OverpowerfulTester.exe" ,
+        "TestMode": "1" 
+      }
+    },
+    {
+      "type": "Parallel-Logger-Secondary",
       "variables": 
       {
         "CacheFolderPath": "C://home//mytestfolder",
@@ -30,7 +46,7 @@
       "variables": 
        {
         "CacheFolderPath": "%AMBVARFOLDPATH%",
-        "DegreeOfParallelism": "" ,
+        "DegreeOfParallelism": 500,
         "EnableLogger": true ,
         "EnableVerbose": true ,
         "ExePath": "C://SimpleTester.exe" ,

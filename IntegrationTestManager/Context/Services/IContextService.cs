@@ -61,5 +61,11 @@ public interface IContextService
     /// <returns></returns>
     Result SetProperties();
 
+    /// <summary>
+    /// Collects the type of tester
+    /// </summary>
+    /// <returns></returns>
+    ExecutorType GetExecutorType();
+
     #endregion
 }

@@ -38,7 +38,29 @@ public record class JsonConfigData
     public Context Context { get; init; } = new();
 
     [JsonPropertyName("testConfigurations")]
-    public Dictionary<string, Variables> TestConfigurations { get; init; } = [];
+    public List<TestConfiguration> TestConfigurationsList { get; init; } = [];
+
+    private Dictionary<string, Variables> _testConfigurations;
+    [JsonIgnore]
+    public Dictionary<string, Variables> TestConfigurations
+    {
+        get
+        {
+            if (_testConfigurations.IsNotNullOrEmpty())
+            {
+                return _testConfigurations;
+            }
+
+            if (TestConfigurationsList.IsNotNullOrEmpty())
+            {
+                _testConfigurations = TestConfigurationsList
+                                        .GroupBy(tc => tc.Type)
+                                        .ToDictionary(g => g.Key, g => g.Last().Variables);
+            }
+
+            return _testConfigurations;
+        }
+    }
 
     /// <summary>
     /// Get the chosen variables set
@@ -48,7 +70,7 @@ public record class JsonConfigData
     {
         if (Context.UseConfigJson)
         {
-            if(TestConfigurations.TryGetValue(Context.TestConfigurationChosen, out Variables variables))
+            if (TestConfigurations.TryGetValue(Context.TestConfigurationChosen, out Variables variables))
             {
                 return variables;
             }
@@ -56,6 +78,18 @@ public record class JsonConfigData
 
         return null;
     }
+}
+
+/// <summary>
+/// Config item block
+/// </summary>
+public record class TestConfiguration
+{
+    [JsonPropertyName("type")]
+    public string Type { get; init; } = string.Empty;
+
+    [JsonPropertyName("variables")]
+    public Variables Variables { get; init; } = new();
 }
 
 /// <summary>
@@ -91,8 +125,8 @@ public record class Variables
     public string ExePath { get; init; } = string.Empty;
 
     [JsonPropertyName("TestMode")]
-    public ushort? TestMode { get; init; }
+    public string TestMode { get; init; }
 
     [JsonPropertyName("Tests")]
-    public IEnumerable<string> Tests { get; init; } = [];
+    public string Tests { get; init; } = string.Empty;
 }
