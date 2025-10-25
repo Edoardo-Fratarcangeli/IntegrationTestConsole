@@ -200,6 +200,16 @@ public class ContextService : IContextService
         string basePath = AppContext.BaseDirectory;
         string fullPath = Path.GetFullPath(Path.Combine(basePath, "..", "Data", "config.json"));
 
+        if (File.Exists(fullPath) == false)
+        {
+#if DEBUG
+            throw new FileNotFoundException(fullPath);
+#else
+			Console.WriteLine($"{nameof(FileNotFoundException)} [{nameof(CollectFromJason)}] : {fullPath}");
+            return Result.Fail();
+#endif
+        }
+        
         ConfigLoader jsonLoader = new();
         if(jsonLoader.Load(fullPath) is JsonConfigData jsonConfig)
         {
